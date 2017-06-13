@@ -17,7 +17,7 @@ Cross compiled:
 // (Spoiler: these definitions are isomorphic)
 
 // trait Api[IO[_]] {
-//   def foo(i: Int, j: Int): IO[Int]
+//   def foo(i: Int, j: Int): IO[String]
 //   def bar(i: Int, s: String): IO[List[String]]
 // }
 
@@ -134,8 +134,8 @@ object Server extends wire.Server[MyRequest, MyResponse, Future] {
   // Boilerplate (implementing the isomorphism)
   def dispatch[C <: MyRequest, R <: MyResponse](c: C { type Res = R }): Future[c.Res] =
     c match {
-      case x: Foo => ((foo _).tupled)(Foo.unapply(x).get).map(FooRes.apply)
-      case x: Bar => ((bar _).tupled)(Bar.unapply(x).get).map(BarRes.apply)
+      case Foo(i, j) => foo(i, j).map(FooRes.apply)
+      case Bar(i, s) => bar(i, s).map(BarRes.apply)
     }
 
   ... // Websocket/AJAX plumbing
